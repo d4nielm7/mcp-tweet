@@ -812,8 +812,12 @@ if __name__ == "__main__":
     # HTTPS Configuration
     SSL_CERT_PATH = os.getenv("SSL_CERT_PATH", "")
     SSL_KEY_PATH = os.getenv("SSL_KEY_PATH", "")
-    SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
+    # Railway uses PORT environment variable, fallback to SERVER_PORT then 8000
+    PORT = os.getenv("PORT", os.getenv("SERVER_PORT", "8000"))
+    SERVER_PORT = int(PORT)
     USE_HTTPS = os.getenv("USE_HTTPS", "false").lower() == "true"
+    # Disable reload in production (Railway will detect this automatically)
+    RELOAD = os.getenv("RELOAD", "false").lower() == "true"
     
     log_startup()
     
@@ -826,11 +830,12 @@ if __name__ == "__main__":
             "main:app", 
             host="0.0.0.0", 
             port=SERVER_PORT, 
-            reload=True,
+            reload=RELOAD,
             ssl_keyfile=SSL_KEY_PATH,
             ssl_certfile=SSL_CERT_PATH
         )
     else:
         startup_logger.info(f"🌐 Starting with HTTP on port {SERVER_PORT}")
+        startup_logger.info(f"🔄 Reload enabled: {RELOAD}")
         startup_logger.info("💡 For HTTPS, set USE_HTTPS=true and provide SSL_CERT_PATH and SSL_KEY_PATH")
-        uvicorn.run("main:app", host="0.0.0.0", port=SERVER_PORT, reload=True)
+        uvicorn.run("main:app", host="0.0.0.0", port=SERVER_PORT, reload=RELOAD)
