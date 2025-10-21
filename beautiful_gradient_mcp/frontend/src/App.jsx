@@ -3,8 +3,9 @@ import { StytchUIClient } from '@stytch/vanilla-js';
 import { useState, useEffect } from 'react';
 import './App.css';
 
-// Initialize Stytch client
-const stytch = new StytchUIClient(import.meta.env.VITE_STYTCH_PUBLIC_TOKEN);
+// Initialize Stytch client with fallback
+const stytchPublicToken = import.meta.env.VITE_STYTCH_PUBLIC_TOKEN || '';
+const stytch = new StytchUIClient(stytchPublicToken);
 
 function LoginFlow() {
   const { session } = useStytchSession();
