@@ -6,6 +6,9 @@ import './App.css';
 // Initialize Stytch client
 const stytch = new StytchUIClient(import.meta.env.VITE_STYTCH_PUBLIC_TOKEN);
 
+// Get API URL from environment variable or fallback to current origin
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+
 function LoginFlow() {
   const { session } = useStytchSession();
   const stytchClient = useStytch();
@@ -34,7 +37,7 @@ function LoginFlow() {
         // Save user profile to backend database
         console.log('🔐 Calling backend to save profile...');
         try {
-          const saveResponse = await fetch(`${window.location.origin}/api/save-profile`, {
+          const saveResponse = await fetch(`${API_URL}/api/save-profile`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -62,7 +65,7 @@ function LoginFlow() {
           console.log('Restored OAuth params for IdentityProvider:', restored);
 
           // Build URL with OAuth params for IdentityProvider to read
-          const urlWithParams = new URL(window.location.origin + window.location.pathname);
+          const urlWithParams = new URL(API_URL + window.location.pathname);
           Object.entries(restored).forEach(([key, value]) => {
             if (value) {
               urlWithParams.searchParams.set(key, value);
@@ -112,7 +115,7 @@ function LoginFlow() {
     setIsLoggingIn(true);
     try {
       // Use clean redirect URL without query params
-      const loginRedirectURL = `${window.location.origin}/login`;
+      const loginRedirectURL = `${API_URL}/login`;
 
       await stytchClient.oauth.twitter.start({
         login_redirect_url: loginRedirectURL,
